@@ -16,31 +16,38 @@
  *
  * ****************************************************************/
 
-int matchhere(char *regexp, char *text);
-int matchstar(int c, char *regexp, char *text);
+int matchhere(char *regexp, char *text, char *matching);
+int matchstar(int c, char *regexp, char *text, char* matching);
 
 int regmatch(char *regexp, char *text) {
-  do {
-		if(matchhere(regexp, text)) return 1;
+  char matching[1000];
+	memset(matching, 0, sizeof(matching));
+	do {
+		if(matchhere(regexp, text, matching)) {
+						printf("Matching text: %s\n", matching);
+						return 1;
+		}
 	} while(*(text++)!='\0');
 	return 0;
 }
 
-int matchhere(char* regexp, char *text) {
+int matchhere(char* regexp, char *text, char *matching) {
 	if(regexp[0]=='\0') return 1;
-	if(regexp[1]=='*') return matchstar(regexp[0], regexp+2, text);
-	if(*text!='\0' && regexp[0]==*text) return matchhere(regexp+1, text+1);
+	if(regexp[1]=='*') return matchstar(regexp[0], regexp+2, text, matching);
+	if(*text!='\0' && regexp[0]==*text) {strncat(matching, text, 1); return matchhere(regexp+1, text+1, matching);}
 	return 0;
 }
 
-int matchstar(int c, char *regexp, char *text) {
+int matchstar(int c, char *regexp, char *text, char *matching) {
 	do {
-		if(matchhere(regexp, text)) return 1;
+		if(matchhere(regexp, text, matching)) return 1;
+		//if(regexp[1]!='*' || regexp[2]=='\0')
+		else	strncat(matching, text, 1);
 	} while(*text!='\0' && *text++==c);
 	return 0;
 }
 
-int testmain(int argc, char **argv){
+int main(int argc, char **argv){
   int match = regmatch(argv[1], argv[2]);
 	if(match) {
 		printf("Matched Pattern: %s Line: %s\n", argv[1], argv[2]);

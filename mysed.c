@@ -8,71 +8,53 @@
 #include <errno.h>
 #include <sys/wait.h>
 #include <ctype.h>
+//#include "deletelines.c"
+#include "regmatch.c"
+#define MAXNUMTOKENS 10
+
 
 /******************************************************************
- * Filename: 
+ * Filename: mysed.c 
  * Created by: Mohammad Luqman
- *
+ * 1. Match and replace text
+ * 2. Delete lines specified by line numbers
  *
  * ****************************************************************/
 
-int deletelines(FILE *fp, char *args) {
-	char *buffer = NULL;
-  size_t bufsize=0;
-	int charsread = 0;
-	int i = 1;
-	int j = 0, k = 0;
-	int linenum[100];
-	char **endptr;
-	int commaflag = 0, periodflag = 0;
-	char c;
-	int arglen = strlen(args);
-	printf("Args: ");
-	while(j<arglen) {
-		if(args[j]==',') commaflag = j;
-		if(args[j]=='.') periodflag = j;
-		j++;
+char** split_into_tokens(char* str) {
+	/*This function takes a string as input and outputs tokens as command or parameter*/
+	char* pch;
+	char* delim = "/";
+	int pos = 0;
+	char** tokens = (char **)malloc(MAXNUMTOKENS*sizeof(char*));
+	pch = strtok(str, delim);
+	while(pch!=NULL) {
+		tokens[pos] = pch;
+		//printf("%s\n", pch);
+		pch = strtok(NULL, delim);
+		pos++;
 	}
-	printf("Commaflag: %d Periodflag: %d\n", commaflag, periodflag);
-	if(!commaflag && !periodflag) { //only single line needs to be deleted
-			linenum[0] = atoi(args+1); 
-			printf("%s, %d, %s, \n", args+1, 2*linenum[0], args+3);
-			//deletesingleline(fp, linenum[0]);
-	}
-	
-	if(periodflag) { //Delete a block of lines
-			linenum[0] = atoi(args+i);
-			linenum[1] = atoi(args+periodflag+1);
-			printf("%s, %d, %d, \n", args+1, 2*linenum[0], 2*linenum[1]);
-			//deleteblock(fp, linenum[0], linenum[1]);
-	}
-	j = 0; k = 1; //Start k from 1 because 1st linenum is filled manually
-	
-	if(commaflag) {
-		linenum[0] = atoi(args+1);
-		while(j<=commaflag) {
-			printf("While loop: %d \n", j);
-			if(args[j]==','){
-							linenum[k] = atoi(args+j+1);
-							printf("%d ", linenum[k]);
-							k++;
-						}
-			j++;
-		}
-		linenum[j] = 1000000;
-	}
-	printf("\n");
-	while((charsread = getline(&buffer, &bufsize, fp))>0) {
-		printf("%d %s", i, buffer);
-		i++;
-	}
+	tokens[pos] = NULL;
+	return tokens;
+}
+
+int replacepattern(FILE *fp, char* args) {
+	char **tokens;
+	tokens = split_into_tokens(args);
+	printf("Tokens split received: %s %s %s\n", tokens[0], tokens[1], tokens[2]);
+	printf("Match result: %d\n", regmatch(tokens[1], tokens[2]));
 	return 0;
 }
 
 
 int main(int argc, char **argv){
 		FILE *fp = fopen("sm.txt", "r+");
-		deletelines(fp, argv[1]);
-			return 0;
+		char flagchar;
+		int argvlen = strlen(argv[1]);
+		flagchar = argv[1][argvlen-1];
+		printf("Flagchar: %c", flagchar);
+		//deletelines(fp, argv[1]);
+		replacepattern(fp, argv[1]);
+		return 0;
 }
 
