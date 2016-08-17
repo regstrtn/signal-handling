@@ -27,7 +27,7 @@ int findlineinarr(int l, int linenum[], int numcommas) {
 	return flag;
 }
 
-int deletelines(FILE *fp, char *args2) {
+int deletelines(FILE *fp,FILE *fpw, char *args2) {
 	char *buffer = NULL;
   size_t bufsize=0;
 	int charsread = 0;
@@ -41,7 +41,7 @@ int deletelines(FILE *fp, char *args2) {
 	int arglen = strlen(args2);
 	char args1[strlen(args2)];
 	char args[strlen(args2)];
-	if((int)args2[0]==27) {
+	if((int)args2[0]=='\\') {
 		invflag = 1;
 		printf("Invert flag: %d %s\n", invflag, args2);
 		strcpy(args1, args2);
@@ -62,8 +62,8 @@ int deletelines(FILE *fp, char *args2) {
 			//deletesingleline(fp, linenum[0]);
 	l = 1;
 		while((charsread = getline(&buffer, &bufsize, fp))>0) {
-			if(l!=linenum[0] && !invflag) printf("%d %s",l, buffer);
-			if(l==linenum[0] && invflag) printf("%d %s", l, buffer);
+			if(l!=linenum[0] && !invflag) fprintf(fpw, "%d %s",l, buffer);
+			if(l==linenum[0] && invflag) fprintf(fpw, "%d %s", l, buffer);
 			l++;
 		} 
 	} buffer = NULL;	
@@ -73,8 +73,8 @@ int deletelines(FILE *fp, char *args2) {
 			//deleteblock(fp, linenum[0], linenum[1]);
 	l = 1;
 		while((charsread=getline(&buffer, &bufsize, fp))>0) {
-			if(!invflag && (l<linenum[0] || l>linenum[1])) printf("%d %s",l, buffer);
-			if(invflag && (l>=linenum[0] && l<=linenum[1])) printf("%d %s", l, buffer);
+			if(!invflag && (l<linenum[0] || l>linenum[1])) fprintf(fpw, "%d %s",l, buffer);
+			if(invflag && (l>=linenum[0] && l<=linenum[1])) fprintf(fpw, "%d %s", l, buffer);
 			l++;
 			//Code for deleting block of lines here
 		}
@@ -94,8 +94,8 @@ int deletelines(FILE *fp, char *args2) {
 		}
 		l = 1;
 		while((charsread = getline(&buffer, &bufsize, fp))>0) {
-			if(!invflag && !findlineinarr(l, linenum, numcommas)) printf("%d %s", l, buffer);
-			if(invflag && findlineinarr(l, linenum, numcommas)) printf("%d %s", l, buffer);
+			if(!invflag && !findlineinarr(l, linenum, numcommas)) fprintf(fpw, "%d %s", l, buffer);
+			if(invflag && findlineinarr(l, linenum, numcommas)) fprintf(fpw, "%d %s", l, buffer);
 			l++;
 				//match linenum with linenums in array
 				//do not print matching line numbers
@@ -110,9 +110,10 @@ int deletelines(FILE *fp, char *args2) {
 }
 
 
-int testmain(int argc, char **argv){
+int deletelines_main(int argc, char **argv){
 		FILE *fp = fopen("sm.txt", "r+");
-		deletelines(fp, argv[1]);
+		FILE *fpw = fopen("mt2.txt", "w+");
+		deletelines(fp, fpw, argv[1]);
 			return 0;
 }
 

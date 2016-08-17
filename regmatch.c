@@ -12,19 +12,20 @@
 /******************************************************************
  * Filename: regmatch.c
  * Created by: Mohammad Luqman
- *
+ * 
  *
  * ****************************************************************/
 
 int matchhere(char *regexp, char *text, char *matching);
 int matchstar(int c, char *regexp, char *text, char* matching);
 
-int regmatch(char *regexp, char *text) {
+int regmatch(char *regexp, char *text, char *matchedtext) {
   char matching[1000];
 	memset(matching, 0, sizeof(matching));
 	do {
 		if(matchhere(regexp, text, matching)) {
-						printf("Matching text: %s\n", matching);
+						strcpy(matchedtext, matching);
+						//printf("Matching text: %s\n", matching);
 						return 1;
 		}
 	} while(*(text++)!='\0');
@@ -42,16 +43,16 @@ int matchstar(int c, char *regexp, char *text, char *matching) {
 	do {
 		if(matchhere(regexp, text, matching)) return 1;
 		//if(regexp[1]!='*' || regexp[2]=='\0')
-		else	strncat(matching, text, 1);
+		else if(*text!='\0' && *text==c)	strncat(matching, text, 1);
 	} while(*text!='\0' && *text++==c);
 	return 0;
 }
 
-int main(int argc, char **argv){
-  int match = regmatch(argv[1], argv[2]);
+int regmatch_main(int argc, char **argv){
+ /* int match = regmatch(argv[1], argv[2]);
 	if(match) {
 		printf("Matched Pattern: %s Line: %s\n", argv[1], argv[2]);
 	}
 	else printf("Not matched pattern: %s Line: %s\n", argv[1], argv[2]);
-	return 0;
+ */	return 0;
 }
