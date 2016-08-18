@@ -15,9 +15,13 @@
 
 /******************************************************************
  * Filename: mysed.c 
- * Created by: Mohammad Luqman
+ * Created and owned by: Mohammad Luqman
  * 1. Match and replace text
  * 2. Delete lines specified by line numbers
+ * 
+ * Copyright:
+ * This code is part of lab assignment 4 - mysed. It cannot be copied
+ * or distributed without the express permission of the owner. 
  *
  * ****************************************************************/
 
@@ -45,6 +49,7 @@ int replacepattern(FILE *fpr, FILE *fpw, char* args) {
 	size_t bufsize = 0;
 	int charsread = 0, matchresult = 0, replaceall = 0, replacen = 1, i = 1;
 	char * firstmatch, *matchend;
+	char extrachar;
 	tokens = split_into_tokens(args);
 	printf("Tokens split received: %s %s %s\n", tokens[0], tokens[1], tokens[2]);
 	if(tokens[3]!=NULL) {
@@ -64,14 +69,15 @@ int replacepattern(FILE *fpr, FILE *fpw, char* args) {
 				*firstmatch = '\0';
 				fprintf(fpw, "%s%s", buffer, tokens[2]);
 			}
-			else {
+			if(!replaceall && i!=replacen) {
+				extrachar = *(firstmatch+strlen(matchedtext)-1);
 				*(firstmatch+strlen(matchedtext)-1)='\0';
-				if(matchresult && i!=replacen) fprintf(fpw, "%s%s", matchedtext, buffer);
-				fprintf(fpw, "%s", buffer);
+				fprintf(fpw, "%s%c", buffer, extrachar);
+				//if(matchresult && i!=replacen) fprintf(fpw, "%s",  matchedtext);
 			}
 			if(matchend!=NULL) buffer = matchend;
 			printf("Buffer: %s I: %d\n", buffer, i);
-			i++;
+			i++; fflush(NULL);
 		}
 		if(!matchresult) {fprintf(fpw, "%s\n", buffer);}
 	  if(matchresult) fprintf(fpw, "%s\n", matchend);	
@@ -82,7 +88,9 @@ int replacepattern(FILE *fpr, FILE *fpw, char* args) {
 
 
 int main(int argc, char **argv){
-		FILE *fpr = fopen("mt.txt", "r+");
+		FILE *fpr;
+		if(argv[2]!=NULL) fpr = fopen(argv[2], "r+");
+		else fpr = stdin;
 		FILE *fpw = fopen("mt2.txt", "w+");
 		char deletechar, replacechar;
 		int deleteflag = 0, replaceflag = 0;
@@ -90,8 +98,10 @@ int main(int argc, char **argv){
 		deletechar = argv[1][argvlen-1];
 		replacechar = argv[1][0];
 		printf("Flagchars: %c %c", deletechar, replacechar);
-		if(deletechar == 'd') deletelines(fpr,fpw, argv[1]);
-		if(replacechar == 's') replacepattern(fpr, fpw, argv[1]);
+		if(deletechar == 'd') deletelines(fpr,fpw, argv[1]);      //If command ends with d, call delete function
+		if(replacechar == 's') replacepattern(fpr, fpw, argv[1]); //If command begins with s, call replace function
+		printf("Main returned after calling deletechar and replacechar : %d %d with parameters: %s\n", deletechar, replacechar, argv[2]);
+		//remove(argv[2]); rename("mt2.txt", argv[2]);   //Uncomment this before final submission. This will rename new file and delete old file. 
 		return 0;
 }
 

@@ -3,6 +3,17 @@
 #include<unistd.h>
 #include <stdlib.h>
 
+/****************************************
+ * Filename: sighandler.c
+ * Created and owned by: Mohammad Luqman
+ *
+ * Acknowledgements:
+ * ----------------
+ *  Geeks for geeks
+ *
+ *
+ * **************************************/
+
 int createtempfile();
 void sighandler2(int signo);
 void sighandler3(int signo);

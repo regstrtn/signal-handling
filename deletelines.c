@@ -11,13 +11,17 @@
 
 /******************************************************************
  * Filename: deletelines.c 
- * Created by: Mohammad Luqman
- * 1. Match and replace text
- * 2. Delete lines specified by line numbers
+ * Owned and created by: Mohammad Luqman
+ * Functionality:
+ * 1. Delete lines specified by line numbers
+ * 
+ * Copyright: 
+ * This code is part of lab assignment 4A. It cannot be copied or
+ * distributed without the express permission of the owner. 
  *
  * ****************************************************************/
 
-
+//Return true if line number present in array
 int findlineinarr(int l, int linenum[], int numcommas) {
 	int i=0;
 	int flag = 0;

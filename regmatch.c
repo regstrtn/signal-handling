@@ -9,12 +9,17 @@
 #include <sys/wait.h>
 
 
-/******************************************************************
+/********************************************************************************
  * Filename: regmatch.c
  * Created by: Mohammad Luqman
  * 
+ * Acknowledgements:
+ * This code was written using the ideas in the Regex Matcher algorithm outlined in the
+ * excellent exegesis by Brian Kernighan (of the Kernighan & Ritchie
+ * fame).
+ * Link: http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html
  *
- * ****************************************************************/
+ * *******************************************************************************/
 
 int matchhere(char *regexp, char *text, char *matching);
 int matchstar(int c, char *regexp, char *text, char* matching);
@@ -35,6 +40,17 @@ int regmatch(char *regexp, char *text, char *matchedtext) {
 int matchhere(char* regexp, char *text, char *matching) {
 	if(regexp[0]=='\0') return 1;
 	if(regexp[1]=='*') return matchstar(regexp[0], regexp+2, text, matching);
+	if (regexp[1] == '+'){
+            if(regexp[0] == text[0]) {
+             	 strncat(matching, text, 1);
+               return matchstar(regexp[0], regexp+2, text+1, matching);
+            }
+            return 0;
+   }    
+  if(regexp[1] == '?') {
+					if(regexp[0] != text[0]) return matchhere(regexp+2, text, matching);
+					if(regexp[0]==text[0]) return matchhere(regexp+2, text+1, matching);
+  } 
 	if(*text!='\0' && regexp[0]==*text) {strncat(matching, text, 1); return matchhere(regexp+1, text+1, matching);}
 	return 0;
 }
